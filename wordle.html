@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+    <title></title>
+    <script type="text/javascript"  charset="UTF-8"></script>
+</head>
+<body>
+    <svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="500px" width="800px" id="main">
+        <g id="text">
+        <text text-anchor="middle" transform="translate(500,72)rotate(0)skewX(0)scale(1,1)" style="font-size: 100px;fill: rgb(57, 59, 121);">word</text>
+        </g>
+    </svg>
+    <style type="text/css">
+        label {
+            font-size: 12px;
+            vertical-align: top;
+            display: inline-block;
+        }
+
+        input {
+            font-size: 15px;
+            height: 30px;
+        }
+    </style>
+    <script>
+        var group = new Array();//text
+        var time = new Array();//time
+        var sumtime=0;
+        var textArr = new Array();//svg array
+
+        function createtextSVG(text, times, id) {
+            var ans = new Object;
+            ans.pos = spiral(random(times));
+            ans.txt = text;
+            ans.size = times;
+            ans.id ="txt"+id;
+            return ans;
+        }
+
+        function check(i) {
+            for (var j = 0; j < i; j++) {
+                var temp = document.getElementById("txt" + j);
+                console.log(temp.offsetWidth);
+            }
+        }
+
+        function createSVG(i) {
+            var main = document.getElementById("main");
+            var txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            //text - anchor="middle" transform = "translate(500,72)rotate(0)skewX(0)scale(1,1)" style = "font-size: 100px;fill: rgb(57, 59, 121);"
+            txt.setAttribute("text-anchor", "middle");
+            txt.setAttribute("transform", "translate(" + (400+textArr[i].pos.x) + "," + (250+textArr[i].pos.y) + ")rotate(0)skewX(0)scale(1,1)");
+            txt.setAttribute("style", "font-size: 100px;fill: rgb(57, 59, 121);");
+            txt.setAttribute("id", textArr[i].id);
+            txt.textContent = textArr[i].txt;
+            main.appendChild(txt);
+            check(i);
+        }
+
+        function rad(x) {
+            var ans = x / 180 * Math.PI;
+            return ans;
+        }
+
+        function spiral(x) { //x is radian         800px*500px     
+            var ans = new Object;
+            ans.x = 25 * x * Math.cos(x);
+            ans.y = 40 * x * Math.sin(x);
+            return ans;
+        }
+
+
+
+        function random(x) {//10 round
+            if (sumtime>=100)
+                return Math.random() * 2 * Math.PI * (1 - Math.sqrt(x / sumtime));
+            else 
+                return Math.random() * 2 * Math.PI * (1 - x / sumtime);
+        }
+        {
+        function quickSort(arr, left, right) {
+            var len = arr.length,
+                partitionIndex,
+                left = typeof left != 'number' ? 0 : left,
+                right = typeof right != 'number' ? len - 1 : right;
+
+            if (left < right) {
+                partitionIndex = partition(arr, left, right);
+                quickSort(arr, left, partitionIndex - 1);
+                quickSort(arr, partitionIndex + 1, right);
+            }
+            return arr;
+        }
+
+        function partition(arr, left, right) {     //分区操作
+            var pivot = left,                      //设定基准值（pivot）
+                index = pivot + 1;
+            for (var i = index; i <= right; i++) {
+                if (arr[i] > arr[pivot]) {
+                    swap(arr, i, index);
+                    index++;
+                }
+            }
+            swap(arr, pivot, index - 1);
+            return index - 1;
+        }
+
+        function swap(arr, i, j) {
+            var temp = arr[i];
+            arr[i] = arr[j];
+            arr[j] = temp;
+            var temp = group[i];
+            group[i] = group[j];
+            group[j] = temp;
+        }
+        }
+        var punctuation = new Array(",", ".", "?", "!");
+
+        function begin() {
+            var text = document.getElementById("onlyinput").value;
+     //       console.log(text);
+            var LowerTxt = text.toLowerCase();
+    //        console.log(LowerTxt);
+            var finalTxt = "";
+            for (var i = 0; i < LowerTxt.length; i++) {
+                if (punctuation.indexOf(LowerTxt[i]) == -1) {
+                    finalTxt += LowerTxt[i];
+                }
+            }
+ //           console.log(finalTxt);
+            var value = finalTxt.split(" ");
+
+
+            for (var i = 0; i < value.length; i++) {
+                if (group.indexOf(value[i]) != -1) {
+                    time[group.indexOf(value[i])] += 1;
+                    sumtime++;
+                } else {
+                    group.push(value[i]);
+                    time[group.indexOf(value[i])] = 1;
+                    sumtime++;
+                }
+            }
+            console.log(group,time);
+            quickSort(time, 0, time.length);
+            
+            for (var i = 0; i < time.length; i++) {
+                textArr[i] = createtextSVG(group[i], time[i], i);
+            }
+            console.log(textArr);
+            for (var i = 0; i < time.length; i++) {
+                textArr[i] = createSVG(i);
+            }
+        }
+    </script>
+    <textarea rows="3" cols="20" id="onlyinput" style="width:500px;height:400px">
+    </textarea>
+    <button onclick="begin()">开始</button>
+</body>
+</html>
