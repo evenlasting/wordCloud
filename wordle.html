@@ -9,7 +9,7 @@
 <body>
     <svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="500px" width="800px" id="main">
         <g id="text">
-        <text text-anchor="middle" transform="translate(500,72)rotate(0)skewX(0)scale(1,1)" style="font-size: 100px;fill: rgb(57, 59, 121);">word</text>
+            <!--<text text-anchor="middle" transform="translate(500,72)rotate(0)skewX(0)scale(1,1)" style="font-size: 100px;fill: rgb(57, 59, 121);">word</text>-->
         </g>
     </svg>
     <style type="text/css">
@@ -39,24 +39,73 @@
             return ans;
         }
 
-        function check(i) {
-            for (var j = 0; j < i; j++) {
-                var temp = document.getElementById("txt" + j);
-                console.log(temp.offsetWidth);
-            }
+        function notin(j, x, y) {
+           var temp = document.getElementById("txt" + j);
+            var w = temp.getBBox().width/2;
+            var h = temp.getBBox().height/2;
+            var x1 = 400 + textArr[j].pos.x + w, x2 = 400 + textArr[j].pos.x - w;
+            var y1 = 250 + textArr[j].pos.y + h, y2 = 250 + textArr[j].pos.y - h;
+            //x1y1,x1y2,x2y2,x2y1
+            /*var dx1 = x1 - x, dx2 = x2 - x, dy1 = y1 - y, dy2 = y2 - y;
+            if (dx1 * dy2 - dx1 * dy1 > 0) return true;
+            if (dx2 * dy2 - dx2 * dy1 > 0) return true;
+            if (dx1 * dy2 - dx2 * dy1 > 0) return true;
+            if (dx1 * dy2 - dx2 * dy1 > 0) return true;*/
+            if (x < x1 && x > x2) return false;
+            if (y < y1 && y > y1) return false;
+            return true;
         }
 
+        function check(i) {
+            var overlap = false;
+            for (var j = 0; j < i; j++) {
+                var temp = document.getElementById("txt" + j);
+              //  console.log("txt" + j, temp.getBBox().height, temp.getBBox().width);
+                var w = document.getElementById("txt" + i).getBBox().width/2;
+                var h = document.getElementById("txt" + i).getBBox().height/2;
+                var x1 = 400 + textArr[i].pos.x + w, x2 = 400 + textArr[i].pos.x - w;
+                var y1 = 250 + textArr[i].pos.y + h, y2 = 250 + textArr[i].pos.y - h;
+                if (notin(j, x1, y2) && notin(j, x1, y1) && notin(j, x2, y1) && notin(j, x2, y2));
+                else
+                  return false;   //overlap
+            }
+            return true;
+        }
+
+        function size(i) {
+
+            return Math.max(10,100-i);
+
+
+        }
+        //400+textArr[i].pos.x+-w 250+textArr[i].pos.y+-h
         function createSVG(i) {
             var main = document.getElementById("main");
             var txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
             //text - anchor="middle" transform = "translate(500,72)rotate(0)skewX(0)scale(1,1)" style = "font-size: 100px;fill: rgb(57, 59, 121);"
             txt.setAttribute("text-anchor", "middle");
-            txt.setAttribute("transform", "translate(" + (400+textArr[i].pos.x) + "," + (250+textArr[i].pos.y) + ")rotate(0)skewX(0)scale(1,1)");
-            txt.setAttribute("style", "font-size: 100px;fill: rgb(57, 59, 121);");
+            txt.setAttribute("transform", "translate(" + (400 + textArr[i].pos.x) + "," + (250 + textArr[i].pos.y) + ")rotate(0)skewX(0)scale(1,1)");
+            txt.setAttribute("style", "font-size: " + size(i) + "px;fill: rgb(" + ~~(Math.random() * 255) + ", " + ~~(Math.random() * 255) + ", " + ~~(Math.random() * 255) + ");");
             txt.setAttribute("id", textArr[i].id);
             txt.textContent = textArr[i].txt;
             main.appendChild(txt);
-            check(i);
+            txt = document.getElementById(textArr[i].id);
+            if (!check(i)) {
+                var x = textArr[i].pos.x/25;
+                var y = textArr[i].pos.y / 40;
+                var theta = Math.sqrt(x * x + y * y);
+
+                for (var j = Math.random(); j < 72; j += Math.random())
+                {
+                    textArr[i].pos = spiral(theta + j);
+                    txt.setAttribute("transform", "translate(" + (400 + textArr[i].pos.x) + "," + (250 + textArr[i].pos.y) + ")rotate(0)skewX(0)scale(1,1)");
+                    if (check(i)) break;
+                }
+                if (!check(i)) {
+                    txt.setAttribute("transform", "translate(" + (40000 + textArr[i].pos.x) + "," + (25000 + textArr[i].pos.y) + ")rotate(0)skewX(0)scale(1,1)");
+                    console.log("overlap");
+                }
+            };
         }
 
         function rad(x) {
@@ -66,8 +115,8 @@
 
         function spiral(x) { //x is radian         800px*500px     
             var ans = new Object;
-            ans.x = 25 * x * Math.cos(x);
-            ans.y = 40 * x * Math.sin(x);
+            ans.x = 40 * x * Math.cos(x);
+            ans.y = 25 * x * Math.sin(x);
             return ans;
         }
 
@@ -75,9 +124,9 @@
 
         function random(x) {//10 round
             if (sumtime>=100)
-                return Math.random() * 2 * Math.PI * (1 - Math.sqrt(x / sumtime));
+                return Math.random() * 4 * Math.PI * (1 - Math.sqrt(x / sumtime));
             else 
-                return Math.random() * 2 * Math.PI * (1 - x / sumtime);
+                return Math.random() * 4 * Math.PI * (1 - x / sumtime);
         }
         {
         function quickSort(arr, left, right) {
@@ -116,7 +165,7 @@
             group[j] = temp;
         }
         }
-        var punctuation = new Array(",", ".", "?", "!");
+        var punctuation = new Array(",", ".", "?", "!",")","(","\"","\n");
 
         function begin() {
             var text = document.getElementById("onlyinput").value;
@@ -151,7 +200,7 @@
             }
             console.log(textArr);
             for (var i = 0; i < time.length; i++) {
-                textArr[i] = createSVG(i);
+                createSVG(i);
             }
         }
     </script>
