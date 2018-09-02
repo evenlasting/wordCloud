@@ -39,7 +39,7 @@
             return ans;
         }
 
-        function notin(j, x, y) {
+        function notin(j, xx1,xx2, yy1,yy2) {
            var temp = document.getElementById("txt" + j);
             var w = temp.getBBox().width/2;
             var h = temp.getBBox().height/2;
@@ -51,9 +51,11 @@
             if (dx2 * dy2 - dx2 * dy1 > 0) return true;
             if (dx1 * dy2 - dx2 * dy1 > 0) return true;
             if (dx1 * dy2 - dx2 * dy1 > 0) return true;*/
-            if (x < x1 && x > x2) return false;
-            if (y < y1 && y > y1) return false;
-            return true;
+            if (xx1 < x2 && xx2 < x2) return true;
+            if (yy1 < y2 && yy2 < y2) return true;
+            if (xx1 > x1 && xx2 > x1) return true;
+            if (yy1 > y1 && yy2 > y1) return true;
+            return false;
         }
 
         function check(i) {
@@ -65,7 +67,8 @@
                 var h = document.getElementById("txt" + i).getBBox().height/2;
                 var x1 = 400 + textArr[i].pos.x + w, x2 = 400 + textArr[i].pos.x - w;
                 var y1 = 250 + textArr[i].pos.y + h, y2 = 250 + textArr[i].pos.y - h;
-                if (notin(j, x1, y2) && notin(j, x1, y1) && notin(j, x2, y1) && notin(j, x2, y2));
+                //if (notin(j, x1, y2) && notin(j, x1, y1) && notin(j, x2, y1) && notin(j, x2, y2)); 可以包起来，所以不对
+                if (notin(j, x1, x2, y1, y2));
                 else
                   return false;   //overlap
             }
@@ -95,7 +98,7 @@
                 var y = textArr[i].pos.y / 40;
                 var theta = Math.sqrt(x * x + y * y);
 
-                for (var j = Math.random(); j < 72; j += Math.random())
+                for (var j = Math.random(); j < 720; j += Math.random())
                 {
                     textArr[i].pos = spiral(theta + j);
                     txt.setAttribute("transform", "translate(" + (400 + textArr[i].pos.x) + "," + (250 + textArr[i].pos.y) + ")rotate(0)skewX(0)scale(1,1)");
@@ -115,8 +118,8 @@
 
         function spiral(x) { //x is radian         800px*500px     
             var ans = new Object;
-            ans.x = 40 * x * Math.cos(x);
-            ans.y = 25 * x * Math.sin(x);
+            ans.x = 4 * x * Math.cos(x);
+            ans.y = 2 * x * Math.sin(x);
             return ans;
         }
 
